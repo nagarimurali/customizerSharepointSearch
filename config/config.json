@@ -1,0 +1,18 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/config.2.0.schema.json",
+  "version": "2.0",
+  "bundles": {
+    "cusomize-sharepoint-serarch-web-part": {
+      "components": [
+        {
+          "entrypoint": "./lib/webparts/cusomizeSharepointSerarch/CusomizeSharepointSerarchWebPart.js",
+          "manifest": "./src/webparts/cusomizeSharepointSerarch/CusomizeSharepointSerarchWebPart.manifest.json"
+        }
+      ]
+    }
+  },
+  "externals": {},
+  "localizedResources": {
+    "CusomizeSharepointSerarchWebPartStrings": "lib/webparts/cusomizeSharepointSerarch/loc/{locale}.js"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "customize-sharepoint-search-client-side-solution",
+    "id": "66a3a404-af27-4bd6-b58f-59d2aa24bcf1",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.18.2"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "CustomizeSharepointSearch description"
+      },
+      "longDescription": {
+        "default": "CustomizeSharepointSearch description"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "customize-sharepoint-search Feature",
+        "description": "The feature that activates elements of the customize-sharepoint-search solution.",
+        "id": "b420033c-d95e-446e-b7e4-647170985fa8",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/customize-sharepoint-search.sppkg"
+  }
+}
