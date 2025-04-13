@@ -9,7 +9,9 @@ import {
     DetailsList,
     Spinner,
     MessageBar,
-    MessageBarType
+    MessageBarType,
+    IconButton,
+    Stack
 } from "@fluentui/react";
 import { WebPartContext } from "@microsoft/sp-webpart-base";
 import { SearchService } from "../service/SearchService";
@@ -21,7 +23,7 @@ import { ISearchResults } from "../interfaces/ISearchResults.ts";
 interface ISearchState {
     columns: IListColumn[];
     selectedColumn: string;
-    query: string;
+    rows: { columnKey: string, query: string }[]; // Dynamic rows with selected column and query
     results: ISearchResults[];
     loading: boolean;
     error: string | null;
@@ -42,7 +44,7 @@ class SearchComponent extends React.Component<ISearchProps, ISearchState> {
         this.state = {
             columns: [],
             selectedColumn: "",
-            query: "",
+            rows: [{ columnKey: "", query: "" }], // Initially one row
             results: [],
             loading: false,
             error: null,
@@ -58,19 +60,75 @@ class SearchComponent extends React.Component<ISearchProps, ISearchState> {
         }
     }
 
+    // handleSearch = async () => {
+    //     const { rows, columns } = this.state;
+    //     if (rows.some(row => !row.columnKey || !row.query)) return;
+
+    //     this.setState({ loading: true, error: null, results: [] });
+
+    //     try {
+    //         let results: ISearchResults[] = [];
+    //         for (const row of rows) {
+    //             const selectedColumnInfo = columns.find(col => col.key === row.columnKey);
+    //             if (!selectedColumnInfo) throw new Error("Selected column not found");
+
+    //             let searchResults: ISearchResults[] = [];
+    //             if (selectedColumnInfo.fieldType === "Lookup") {
+    //                 searchResults = await this.searchService.handleLookupSearch(selectedColumnInfo, row.query);
+    //             } else {
+    //                 searchResults = await this.searchService.handleStandardSearch([{ columnName: row.columnKey, query: row.query }]);
+    //             }
+
+    //             results = [...results, ...searchResults];
+    //         }
+
+    //         this.setState({ results, loading: false });
+    //     } catch (error) {
+    //         this.setState({ error: error.message, loading: false });
+    //     }
+    // };
     handleSearch = async () => {
-        const { selectedColumn, query, columns } = this.state;
-        if (!selectedColumn || !query) return;
+        const { rows, columns } = this.state;
+        if (rows.some(row => !row.columnKey || !row.query)) return;
 
         this.setState({ loading: true, error: null, results: [] });
 
         try {
-            const selectedColumnInfo = columns.find(col => col.key === selectedColumn);
-            if (!selectedColumnInfo) throw new Error("Selected column not found");
+            // Collect all standard filters (non-lookup)
+            const standardFilters = rows
+                .filter(row => {
+                    const column = columns.find(col => col.key === row.columnKey);
+                    return column?.fieldType !== "Lookup"; // Exclude Lookup columns
+                })
+                .map(row => ({ columnName: row.columnKey, query: row.query }));
 
-            const results = selectedColumnInfo.fieldType === "Lookup"
-                ? await this.searchService.handleLookupSearch(selectedColumnInfo, query)
-                : await this.searchService.handleStandardSearch(selectedColumn, query);
+            // Collect Lookup filters
+            const lookupFilters = rows
+                .filter(row => {
+                    const column = columns.find(col => col.key === row.columnKey);
+                    return column?.fieldType === "Lookup";
+                });
+
+            let results: ISearchResults[] = [];
+
+            // Handle standard filters (AND logic)
+            if (standardFilters.length > 0) {
+                const standardResults = await this.searchService.handleStandardSearch(standardFilters);
+                results = standardResults;
+            }
+
+            // Handle Lookup filters (AND logic)
+            if (lookupFilters.length > 0) {
+                for (const row of lookupFilters) {
+                    const column = columns.find(col => col.key === row.columnKey);
+                    if (!column) throw new Error("Column not found");
+                    const lookupResults = await this.searchService.handleLookupSearch(column, row.query);
+                    // Merge results only if there are existing results
+                    results = results.length > 0
+                        ? results.filter(item => lookupResults.some(lr => lr.Id === item.Id))
+                        : lookupResults;
+                }
+            }
 
             this.setState({ results, loading: false });
         } catch (error) {
@@ -78,59 +136,120 @@ class SearchComponent extends React.Component<ISearchProps, ISearchState> {
         }
     };
 
-    handleColumnChange = (_event: React.FormEvent<HTMLDivElement>, option?: IDropdownOption) => {
-        this.setState({ selectedColumn: option?.key.toString() || "" });
+    handleColumnChange = (index: number, _event: React.FormEvent<HTMLDivElement>, option?: IDropdownOption) => {
+        const { rows } = this.state;
+        rows[index].columnKey = option?.key.toString() || "";
+        this.setState({ rows: [...rows] });
     };
 
-    handleQueryChange = (_event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
-        this.setState({ query: newValue || "" });
+    handleQueryChange = (index: number, _event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
+        const { rows } = this.state;
+        rows[index].query = newValue || "";
+        this.setState({ rows: [...rows] });
+    };
+
+    addRow = () => {
+        const { rows } = this.state;
+        this.setState({ rows: [...rows, { columnKey: "", query: "" }] });
+    };
+
+    removeRow = (index: number) => {
+        const { rows } = this.state;
+        rows.splice(index, 1);
+        this.setState({ rows: [...rows] });
     };
 
     render() {
-        const { columns, selectedColumn, query, results, loading, error } = this.state;
+        const { columns, rows, results, loading, error } = this.state;
+        const columnsWithAction = columnsConfig.map((column) => {
+            if (column.key === "approvalDetails") {
+                return {
+                    ...column,
+                    onRender: (item: ISearchResults) => {
+                        // Construct the SharePoint list URL with filters
+                        const siteUrl = this.props.context.pageContext.web.absoluteUrl;
+                        const listName = encodeURIComponent(this.props.listName);
+                        const titleFilter = encodeURIComponent(item.Title);
+
+                        const listUrl = `${siteUrl}/Lists/${listName}/AllItems.aspx?FilterField1=LinkTitle&FilterValue1=${titleFilter}&FilterType1=Computed`;
+
+                        return (
+                            <PrimaryButton
+                                text="Approval Details"
+                                onClick={() => window.open(listUrl, "_blank")}
+                            />
+                        );
+                    },
+                };
+            }
+            return column;
+        });
 
         return (
             <div className="search-container" style={{ padding: 20 }}>
-                <Dropdown
-                    label="Select search column"
-                    options={columns.map(c => ({ key: c.key, text: c.text }))}
-                    selectedKey={selectedColumn}
-                    onChange={this.handleColumnChange}
-                    styles={{ dropdown: { width: 300 } }}
-                />
+                {/* Dynamic Rows */}
+                {rows.map((row, index) => (
+                    <Stack horizontal tokens={{ childrenGap: 10 }} style={{ margin: 14 }} verticalAlign="center" key={index}>
+                        <Dropdown
+                            placeholder="Select Column"
+                            options={columns.map(c => ({ key: c.key, text: c.text }))}
+                            selectedKey={row.columnKey}
+                            onChange={(e, option) => this.handleColumnChange(index, e, option)}
+                            styles={{ dropdown: { width: 200 } }}
+                        />
 
-                <TextField
-                    label="Search value"
-                    value={query}
-                    onChange={this.handleQueryChange}
-                    disabled={!selectedColumn}
-                    styles={{ root: { marginTop: 15 } }}
-                />
+                        <TextField
+                            placeholder="Enter search value"
+                            value={row.query}
+                            onChange={(e, newValue) => this.handleQueryChange(index, e, newValue)}
+                            disabled={!row.columnKey}
+                            styles={{ root: { width: 250 } }}
+                        />
 
+                        <IconButton
+                            iconProps={{ iconName: "Add" }}
+                            title="Add"
+                            onClick={this.addRow}
+                        />
+
+                        <IconButton
+                            iconProps={{ iconName: "Remove" }}
+                            title="Remove"
+                            onClick={() => this.removeRow(index)}
+                            disabled={rows.length <= 1} // Disable Remove for the last row
+                        />
+                    </Stack>
+                ))}
+
+                {/* Search Button */}
                 <PrimaryButton
                     text="Search"
                     onClick={this.handleSearch}
-                    disabled={!selectedColumn || !query}
-                    styles={{ root: { marginTop: 15, marginBottom: 20 } }}
+                    disabled={rows.some(row => !row.columnKey || !row.query)} // Disable if any row is incomplete
+                    styles={{ root: { marginTop: 15 } }}
                 />
 
+                {/* Loading Indicator */}
                 {loading && <Spinner label="Searching..." />}
 
+                {/* Error Message */}
                 {error && (
                     <MessageBar messageBarType={MessageBarType.error} styles={{ root: { marginBottom: 15 } }}>
                         {error}
                     </MessageBar>
                 )}
 
+                {/* Search Results */}
                 {results.length > 0 && (
                     <DetailsList
                         items={results}
-                        columns={columnsConfig}
+                        columns={columnsWithAction}
                         isHeaderVisible={true}
                         styles={{ root: { marginTop: 20 } }}
                     />
                 )}
 
+                {/* No Results Message */}
                 {!loading && !error && results.length === 0 && (
                     <MessageBar styles={{ root: { marginTop: 15 } }}>
                         No results found

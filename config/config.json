@@ -9,10 +9,29 @@
           "manifest": "./src/webparts/cusomizeSharepointSerarch/CusomizeSharepointSerarchWebPart.manifest.json"
         }
       ]
+    },
+    "dms-translatedoc-set-form-customizer": {
+      "components": [
+        {
+          "entrypoint": "./lib/extensions/dmsTranslatedocSet/DmsTranslatedocSetFormCustomizer.js",
+          "manifest": "./src/extensions/dmsTranslatedocSet/DmsTranslatedocSetFormCustomizer.manifest.json"
+        }
+      ]
+    },
+    "employeedetails-form-customizer": {
+      "components": [
+        {
+          "entrypoint": "./lib/extensions/employeedetails/EmployeedetailsFormCustomizer.js",
+          "manifest": "./src/extensions/employeedetails/EmployeedetailsFormCustomizer.manifest.json"
+        }
+      ]
     }
   },
   "externals": {},
   "localizedResources": {
-    "CusomizeSharepointSerarchWebPartStrings": "lib/webparts/cusomizeSharepointSerarch/loc/{locale}.js"
+    "CusomizeSharepointSerarchWebPartStrings": "lib/webparts/cusomizeSharepointSerarch/loc/{locale}.js",
+    "DmsTranslatedocSetFormCustomizerStrings": "lib/extensions/dmsTranslatedocSet/loc/{locale}.js",
+    "EmployeedetailsFormCustomizerStrings": "lib/extensions/employeedetails/loc/{locale}.js",
+    "ControlStrings": "node_modules/@pnp/spfx-controls-react/lib/loc/{locale}.js"
   }
 }

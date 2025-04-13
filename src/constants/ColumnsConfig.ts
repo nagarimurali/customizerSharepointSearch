@@ -25,13 +25,6 @@ export const columnsConfig: IColumn[] = [
         isResizable: true
     },
     {
-        key: 'Note',
-        name: 'Note',
-        fieldName: 'Note',
-        minWidth: 150,
-        isResizable: true
-    },
-    {
         key: 'BU',
         name: 'BU',
         fieldName: 'BU',
@@ -44,6 +37,13 @@ export const columnsConfig: IColumn[] = [
         fieldName: 'PartNumber',
         minWidth: 100,
         isResizable: true
+    },
+    {
+        key: "approvalDetails",
+        name: "Approval Details",
+        minWidth: 120,
+        isResizable: false,
+      
     }
 
 ];

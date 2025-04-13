@@ -2,5 +2,94 @@
   "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/spfx-serve.schema.json",
   "port": 4321,
   "https": true,
-  "initialPage": "https://{tenantDomain}/_layouts/workbench.aspx"
+  "initialPage": "https://{tenantDomain}/_layouts/workbench.aspx",
+  "serveConfigurations": {
+    "default": {
+      "pageUrl": "https://{tenantDomain}/_layouts/15/SPListForm.aspx",
+      "formCustomizer": {
+        "componentId": "11246d47-d4d7-4419-99cd-69796a0267f3",
+        "PageType": 8,
+        "RootFolder": "/sites/mySite/Lists/MyList",
+        "properties": {
+          "sampleText": "Value"
+        }
+      }
+    },
+    "dmsTranslatedocSet_NewForm": {
+      "pageUrl": "https://mrxcoder.sharepoint.com/sites/DOC-INt/_layouts/15/SPListForm.aspx",
+      "formCustomizer": {
+        "componentId": "11246d47-d4d7-4419-99cd-69796a0267f3",
+        "PageType": 8,
+        "RootFolder": "/sites/DOC-INt/Lists/Translator",
+        "ContentTypeID": "0x0106007F78E7573CF49643805D371402DCD537",
+        "properties": {
+          "sampleText": "Value"
+        }
+      }
+    },
+    "dmsTranslatedocSet_EditForm": {
+      "pageUrl": "https://mrxcoder.sharepoint.com/sites/DOC-INt/_layouts/15/SPListForm.aspx",
+      "formCustomizer": {
+        "componentId": "11246d47-d4d7-4419-99cd-69796a0267f3",
+        "PageType": 6,
+        "RootFolder": "/sites/DOC-INt/Lists/Translator",
+        "ContentTypeID": "0x0106007F78E7573CF49643805D371402DCD537",
+        "ID": 1,
+        "properties": {
+          "sampleText": "Value"
+        }
+      }
+    },
+    "dmsTranslatedocSet_ViewForm": {
+      "pageUrl": "https://mrxcoder.sharepoint.com/sites/DOC-INt/_layouts/15/SPListForm.aspx",
+      "formCustomizer": {
+        "componentId": "11246d47-d4d7-4419-99cd-69796a0267f3",
+        "PageType": 4,
+        "RootFolder": "/sites/DOC-INt/Lists/Translator",
+        "ContentTypeID": "0x0106007F78E7573CF49643805D371402DCD537",
+        "ID": 1,
+        "properties": {
+          "sampleText": "Value"
+        }
+      }
+    },
+    "employeedetails_NewForm": {
+      "pageUrl": "https://mrxcoder.sharepoint.com/sites/DOC-INt/_layouts/15/SPListForm.aspx",
+      "formCustomizer": {
+        "componentId": "2fdd4961-a933-4e8c-8f9c-11a7fd7f394d",
+        "PageType": 8,
+        "ContentTypeID": "0x0100A9DE9527074D1D408617DEC451BD200100F9B7A61CF7FB2347918308282B3BC11A",
+        "RootFolder": "/sites/DOC-INt/Lists/EmployeeDetails",
+        "properties": {
+          "sampleText": "Value"
+        }
+      }
+    },
+    "employeedetails_EditForm": {
+      "pageUrl": "https://mrxcoder.sharepoint.com/sites/DOC-INt/_layouts/15/SPListForm.aspx",
+      "formCustomizer": {
+        "componentId": "2fdd4961-a933-4e8c-8f9c-11a7fd7f394d",
+        "PageType": 6,
+        "ContentTypeID": "0x0100A9DE9527074D1D408617DEC451BD200100F9B7A61CF7FB2347918308282B3BC11A",
+        "RootFolder": "/sites/DOC-INt/Lists/EmployeeDetails",
+        "ID": 1,
+        "properties": {
+          "sampleText": "Value"
+        }
+      }
+    },
+    "employeedetails_ViewForm": {
+      "pageUrl": "https://mrxcoder.sharepoint.com/sites/DOC-INt/_layouts/15/SPListForm.aspx",
+      "formCustomizer": {
+        "componentId": "2fdd4961-a933-4e8c-8f9c-11a7fd7f394d",
+        "PageType": 4,
+        "ContentTypeID": "0x0100A9DE9527074D1D408617DEC451BD200100F9B7A61CF7FB2347918308282B3BC11A",
+        "RootFolder": "/sites/DOC-INt/Lists/EmployeeDetails",
+        "ID": 1,
+        "properties": {
+          "sampleText": "Value"
+        }
+      }
+    }
+  }
 }
